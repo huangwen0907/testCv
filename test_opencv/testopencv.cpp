@@ -38,6 +38,14 @@ int main(int argv, char* argc)
         // write a new image
         imwrite("data/imggray.jpg",grayImg);
         imshow("gray img",grayImg);
+
+        // copy a rectangle picture
+        Mat imgRect;
+        imgRect.create(img.rows/2,img.cols/2,CV_8UC3);
+        // img.copyTo(imgRect);
+        // pyrDown the image (pyramid process)
+        pyrDown(img,imgRect);
+        imshow("Rectangle",imgRect);
     }
 
     {
