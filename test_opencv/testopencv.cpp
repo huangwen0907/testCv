@@ -1,7 +1,7 @@
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-// #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 using namespace std;
 using namespace cv;
@@ -23,9 +23,21 @@ int main(int argv, char* argc)
 
 
     {
-    // read the image
-    Mat img = imread("data/img.jpg");
-    // cout << "img:" << endl << img <<endl;
+        // read the image
+        Mat img = imread("data/img.jpg");
+        // modify the image
+
+        if (!img.data) {
+            cout << "No valid image, please get the correct address" << endl;
+            return -1;
+        }
+        imshow("raw image",img);
+
+        Mat grayImg;
+        cvtColor(img,grayImg,CV_BGR2GRAY);
+        // write a new image
+        imwrite("data/imggray.jpg",grayImg);
+        imshow("gray img",grayImg);
     }
 
     {
@@ -50,5 +62,6 @@ int main(int argv, char* argc)
 
     }
 
+    waitKey(0);
     return  0;
 }
