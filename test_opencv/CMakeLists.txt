@@ -18,3 +18,7 @@ add_definitions( ${PCL_DEFINITIONS} )
 
 add_executable(testopencv testopencv.cpp )
 target_link_libraries( testopencv ${OpenCV_LIBS} ${PCL_LIBRARIES} )
+
+
+add_executable(testimg testimg.cpp )
+target_link_libraries( testimg ${OpenCV_LIBS} ${PCL_LIBRARIES} )
