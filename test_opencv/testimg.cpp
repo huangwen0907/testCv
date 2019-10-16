@@ -10,6 +10,7 @@ using namespace std;
     1: mix the image g(x) = (1-a)f1(x) + f2 (x)
     2: change the brightness about the image: g(x) = a*f(x) + b
         a & b is used as the gain and bias paramters
+    3: modify the image by DFT(discrete fourier transform)
 */
 int main(int argc,char* argv)
 {
@@ -17,7 +18,7 @@ int main(int argc,char* argv)
     /// Ask the user case value
     std::cout<<" Simple case value "<<std::endl;
     std::cout<<"-----------------------"<<std::endl;
-    std::cout<<"* Enter 1:mix image, 2:modify the brightness "<< endl;
+    std::cout<<"* Enter 1:mix image, 2:modify the brightness 3:modify the image by DFT "<< endl;
     std::cin >> caseValue;
 
     if (caseValue == 1) {
@@ -83,6 +84,82 @@ int main(int argc,char* argv)
         namedWindow("brightness");
         imshow("newImg",newImg);
 
+    } else if (caseValue == 3) {
+        // do the discrete fourier transform
+        // must read the gray image,if not, it will crash in below line:
+        // Mat planes[] = {Mat_<float>(padded), Mat::zeros(padded.size(), CV_32F)};
+        Mat img = imread("data/img.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+        if(img.empty()) {
+            cout << "fuck , why not get a valid image" << endl;
+            return -1;
+        }
+
+        Mat padded; // expand the input image to optimal size
+        int m = getOptimalDFTSize(img.rows);
+        int n = getOptimalDFTSize(img.cols);
+        // on the border add zero values
+        //copies 2D array to a larger destination array with extrapolation of the outer part of src using the specified border mode
+        //oid copyMakeBorder( InputArray src, OutputArray dst,
+                        // int top, int bottom, int left, int right,
+                        // int borderType, const Scalar& value=Scalar() );
+        copyMakeBorder(img,padded,0,m-img.rows,0,n-img.cols,BORDER_CONSTANT,Scalar::all(0));
+
+        Mat planes[] = {Mat_<float>(padded), Mat::zeros(padded.size(), CV_32F)};
+
+        Mat complexImg;
+
+        // Add to the expanded another plane with zeros
+        // OutputIterator merge(const SinglePassRange1& rng1,const SinglePassRange2& rng2, OutputIterator          out)
+        merge(planes,2,complexImg);
+
+        // This way the result may fit in the source matrix
+        // performs forward or inverse 1D or 2D Discrete Fourier Transformation
+        // CV_EXPORTS_W void dft(InputArray src, OutputArray dst, int flags=0, int nonzeroRows=0);
+        dft(complexImg,complexImg);
+
+        // compute the magnitude and switch to logarithmic scale
+        // => log(1 + sqrt(Re(DFT(I))^2 + Im(DFT(I))^2))
+        // void split(const Mat& src, vector<Mat_<_Tp> >& mv)
+        split(complexImg,planes); // planes[0] = Re(DFT(I), planes[1] = Im(DFT(I))
+
+        //! computes magnitude (magnitude(i)) of each (x(i), y(i)) vector
+        // CV_EXPORTS_W void magnitude(InputArray x, InputArray y, OutputArray magnitude);
+        magnitude(planes[0],planes[1],planes[0]); //planes[0] = magnitude
+
+        Mat magPlanes = planes[0];
+        magPlanes += Scalar::all(1); // switch to logarithmic scale
+
+        log(magPlanes,magPlanes);
+
+        // crop the spectrum, if it has an odd number of rows or columns
+        magPlanes = magPlanes(Rect(0,0,magPlanes.cols&-2, magPlanes.rows& -2));
+
+        // rearrange the quadrants of Fourier image so that the origin is at the image center
+        int cx = magPlanes.cols/2;
+        int cy = magPlanes.rows/2;
+
+        Mat q0(magPlanes,Rect(0,0,cx,cy)); // top-left
+        Mat q1(magPlanes,Rect(cx,0,cx,cy)); // top-right
+        Mat q2(magPlanes,Rect(0,cy,cx,cy)); // bottom-left
+        Mat q3(magPlanes,Rect(cx,cy,cx,cy)); // bottom-right
+
+        // switch the q0<--> q3
+        Mat tmp;
+        q0.copyTo(tmp);
+        q3.copyTo(q0);
+        tmp.copyTo(q3);
+
+
+        q1.copyTo(tmp);
+        q2.copyTo(q1);
+        tmp.copyTo(q2);
+
+        normalize(magPlanes,magPlanes,0,1,CV_MINMAX);
+
+        namedWindow("DFT");
+
+        imshow("input Image",img);
+        imshow("spectrum magnitude",magPlanes);
     } else {
         cout << "fuck why you can not input a correct case value" << endl;
         return -1;
