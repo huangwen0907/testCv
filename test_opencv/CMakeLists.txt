@@ -22,3 +22,6 @@ target_link_libraries( testopencv ${OpenCV_LIBS} ${PCL_LIBRARIES} )
 
 add_executable(testimg testimg.cpp )
 target_link_libraries( testimg ${OpenCV_LIBS} ${PCL_LIBRARIES} )
+
+add_executable(testimgproc testimgproc.cpp )
+target_link_libraries( testimgproc ${OpenCV_LIBS} ${PCL_LIBRARIES} )
