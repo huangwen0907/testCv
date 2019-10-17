@@ -19,6 +19,7 @@ int main(int argc,char* argv)
     std::cout<<" Simple case value "<<std::endl;
     std::cout<<"-----------------------"<<std::endl;
     std::cout<<"* Enter 1:mix image, 2:modify the brightness 3:modify the image by DFT 4: Filter the Image"<< endl;
+    std::cout << "5: add boarder in the image" << endl;
     std::cin >> caseValue;
 
     if (caseValue == 1) {
@@ -196,6 +197,59 @@ int main(int argc,char* argv)
             filter2D(src,dst,ddepth,kernel,anchor,delta,BORDER_DEFAULT);
             imshow(windNmae,dst);
             ind ++;
+        }
+
+    } else if (caseValue == 5) {
+
+        Mat src, dst;
+        int top, bottom, left, right;
+        int borderType;
+        Scalar value;
+        char* window_name = "copyMakeBorder Demo";
+        RNG rng(12345);
+
+        int c;
+
+        /// Input the image
+        src = imread("data/img3.jpg",CV_LOAD_IMAGE_UNCHANGED);
+
+        if( !src.data )
+        { return -1;
+            printf(" No data entered, please enter the path to an image file \n");
+        }
+
+        /// 使用说明
+        printf( "\n \t copyMakeBorder Demo: \n" );
+        printf( "\t -------------------- \n" );
+        printf( " ** Press 'c' to set the border to a random constant value \n");
+        printf( " ** Press 'r' to set the border to be replicated \n");
+        printf( " ** Press 'ESC' to exit the program \n");
+
+        /// 创建显示窗口
+        namedWindow( window_name, CV_WINDOW_AUTOSIZE );
+
+        /// 初始化输入参数
+        top = (int) (0.05*src.rows); bottom = (int) (0.05*src.rows);
+        left = (int) (0.05*src.cols); right = (int) (0.05*src.cols);
+        dst = src;
+
+        imshow( window_name, dst );
+
+        while( true )
+        {
+            c = waitKey(1000);
+
+            if( (char)c == 27 )
+                { break; }
+            else if( (char)c == 'c' )
+                { borderType = BORDER_CONSTANT; }
+            else if( (char)c == 'r' )
+                { borderType = BORDER_REPLICATE; }
+
+            value = Scalar( rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255) );
+            copyMakeBorder( src, dst, top, bottom, left, right, borderType, value );
+
+            imshow( window_name, dst );
         }
 
     } else {
