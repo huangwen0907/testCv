@@ -33,3 +33,6 @@ target_link_libraries( testCanny ${OpenCV_LIBS} ${PCL_LIBRARIES} )
 
 add_executable(testHough testHough.cpp )
 target_link_libraries( testHough ${OpenCV_LIBS} ${PCL_LIBRARIES} )
+
+add_executable(testHistogram testHistogram.cpp )
+target_link_libraries(testHistogram ${OpenCV_LIBS} ${PCL_LIBRARIES} )
