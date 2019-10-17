@@ -19,9 +19,17 @@ int const max_elem = 2;
 int const max_kernel_size = 21;
 Mat src;
 
+// Threshold Operation
+char * windName = "Threshold";
+int maxType = 4;
+double maxValue = 255;
+int thresholdType = 2;
+int thresholdValue = 122;
+
 /** Function Headers */
 void Erosion( int, void* );
 void Dilation( int, void* );
+void ThresholdDemo(int, void*);
 
 int main(int argc, char* argv)
 {
@@ -38,6 +46,7 @@ int main(int argc, char* argv)
     namedWindow( "Erosion Demo", CV_WINDOW_AUTOSIZE );
     namedWindow( "Dilation Demo", CV_WINDOW_AUTOSIZE );
     cvMoveWindow( "Dilation Demo", src.cols, 0 );
+    cvMoveWindow( "Dilation Demo", src.rows, 0 );
 
     /// 创建腐蚀 Trackbar
     // int createTrackbar(const string& trackbarname, const string& winname,
@@ -61,12 +70,31 @@ int main(int argc, char* argv)
                     &dilation_size, max_kernel_size,
                     Dilation );
 
+    // 阈值操作
+
+    // int createTrackbar(const string& trackbarname, const string& winname,
+    //                             int* value, int count,
+    //                             TrackbarCallback onChange = 0,
+    //                             void* userdata = 0);
+    namedWindow(windName,CV_WINDOW_AUTOSIZE);
+    createTrackbar("Type:\n 0:binary \n 1:BInar Inverted \n 2:Truncate \n 3:To zero \n 4:To Zero Inverted",
+                    windName,&thresholdType,maxType,ThresholdDemo);
+    createTrackbar("Track Value",
+                windName,&thresholdValue,maxValue,ThresholdDemo);
+
     /// Default start
     Erosion( 0, 0 );
     Dilation( 0, 0 );
 
     waitKey(0);
     return 0;
+}
+
+void ThresholdDemo(int, void*)
+{
+    Mat dstImg;
+    threshold(src,dstImg,thresholdValue,255,thresholdType);
+    imshow(windName,dstImg);
 }
 
 /**  @function Erosion  */
