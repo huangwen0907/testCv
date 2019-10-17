@@ -18,7 +18,7 @@ int main(int argc,char* argv)
     /// Ask the user case value
     std::cout<<" Simple case value "<<std::endl;
     std::cout<<"-----------------------"<<std::endl;
-    std::cout<<"* Enter 1:mix image, 2:modify the brightness 3:modify the image by DFT "<< endl;
+    std::cout<<"* Enter 1:mix image, 2:modify the brightness 3:modify the image by DFT 4: Filter the Image"<< endl;
     std::cin >> caseValue;
 
     if (caseValue == 1) {
@@ -160,6 +160,44 @@ int main(int argc,char* argv)
 
         imshow("input Image",img);
         imshow("spectrum magnitude",magPlanes);
+    } else if (caseValue == 4) {
+        Mat src, dst;
+        Mat kernel;
+        Point anchor;
+        double delta;
+        int ddepth;
+        int kernelSize;
+        char* windNmae = "Filter2D Demo";
+
+        int c;
+        src = imread("data/img3.jpg",CV_LOAD_IMAGE_UNCHANGED);
+        if(src.empty()) {
+            cout << "fuck, get a valid input image" << endl;
+        }
+
+        namedWindow(windNmae,CV_WINDOW_AUTOSIZE);
+
+        // Point(-1, -1): 指定锚点位置(被平滑点)， 如果是负值，取核的中心为锚点。
+        anchor = Point(-1,-1);
+        delta = 0;
+        ddepth = -1;
+
+        int ind = 0;
+
+        while (true)
+        {
+            c = waitKey(1000);
+            if((char)c == 'c') {
+                break;
+            }
+            kernelSize = 3+2*(ind%5);
+            kernel = Mat::ones(kernelSize,kernelSize,CV_32F)/(float)(kernelSize * kernelSize);
+
+            filter2D(src,dst,ddepth,kernel,anchor,delta,BORDER_DEFAULT);
+            imshow(windNmae,dst);
+            ind ++;
+        }
+
     } else {
         cout << "fuck why you can not input a correct case value" << endl;
         return -1;
