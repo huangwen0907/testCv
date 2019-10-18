@@ -21,3 +21,7 @@ target_link_libraries( testVedio ${OpenCV_LIBS} ${PCL_LIBRARIES} )
 
 add_executable(testFeatureHarris testFeatureHarris.cpp )
 target_link_libraries( testFeatureHarris ${OpenCV_LIBS} ${PCL_LIBRARIES} )
+
+
+add_executable(testFeatureDescription testFeatureDescription.cpp )
+target_link_libraries( testFeatureDescription ${OpenCV_LIBS} ${PCL_LIBRARIES} )
