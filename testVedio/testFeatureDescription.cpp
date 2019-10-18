@@ -34,13 +34,37 @@ int main(int argc, char** argv)
     cv::Ptr<DescriptorMatcher> matcher = cv::DescriptorMatcher::create("BruteForce-Hamming");
     matcher->match(descriptor_1,descriptor_2,matches);
 
+    cout << "fuck matches: " << matches.size() << endl;
+
+    // Quick calculation of max and min distances between keypoints
+    Mat optimizeMap;
+    // optimizeMap = matchMap.clone();
+    double max_dist = 0, min_dist = 100;
+    for (int i = 0; i < descriptor_1.rows;i++) {
+        double dist = matches[i].distance;
+        cout << "fuck dist: " << matches[i].distance << endl;
+        if (dist > max_dist) max_dist = dist;
+        if (dist < min_dist) min_dist = dist;
+    }
+    cout << "fuck max dist: " << max_dist << "  min dist: " << min_dist << endl;
+
+    // store the good matches
+    std::vector<DMatch> goodMatches;
+    for (int i = 0;i<descriptor_1.rows;i++) {
+        if (matches[i].distance < 2 * min_dist) {
+            goodMatches.push_back(matches[i]);
+        }
+    }
+
+
     Mat matchMap;
     drawMatches(img1,keypoint_1,img2,keypoint_2,matches,matchMap,Scalar::all(-1));
 
-    pyrDown(matchMap,matchMap);
+    // pyrDown(matchMap,matchMap);
     imshow("match map",matchMap);
 
-    cout << "fuck matches: " << matches.size() << endl;
+    drawMatches(img1,keypoint_1,img2,keypoint_2,goodMatches,optimizeMap,Scalar::all(-1));
+    imshow("goodMatches map",optimizeMap);
 
     waitKey(0);
     return 0;
