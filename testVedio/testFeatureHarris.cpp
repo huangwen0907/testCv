@@ -114,4 +114,17 @@ void shiTomasiDemo(int,void*)
 
     namedWindow("fuck ShiT-Tomas",CV_WINDOW_AUTOSIZE);
     imshow("Coners Shi-Tomas",copy);
+
+    // 亚像素级的角点检测
+    // set the parameters
+    Size winSize = Size(5,5);
+    Size zeroZone = Size(5,5);
+
+    TermCriteria criteria = TermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER,40,0.001);
+
+    cornerSubPix(srcGray,corners,winSize,zeroZone,criteria);
+
+    for (int i= 0;i < corners.size();i++) {
+        cout<<" -- Refined Corner ["<<i<<"]  ("<<corners[i].x<<","<<corners[i].y<<")"<<endl;
+    }
 }
