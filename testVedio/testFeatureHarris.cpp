@@ -7,10 +7,18 @@ using namespace std;
 using namespace cv;
 
 void cornerHarrisDemo(int,void*);
+void shiTomasiDemo(int,void*);
 
+// Harris
 char *sourceWindow = "feature detected";
 int threshValue = 200;
 int maxThreshValue = 255;
+
+// Shi-Tomasi
+RNG rng(12345);
+int ShiConers = 23;
+int maxShiTrackBAR = 100;
+
 Mat src, srcGray;
 int main(int argc,char** argv)
 {
@@ -25,10 +33,12 @@ int main(int argc,char** argv)
     namedWindow(sourceWindow,CV_WINDOW_AUTOSIZE);
     cvMoveWindow( sourceWindow, src.rows, 0 );
     cvMoveWindow( sourceWindow, src.cols, 0 );
-    createTrackbar("Threshold:",sourceWindow,&threshValue,maxThreshValue,cornerHarrisDemo);
+    createTrackbar("Harris Threshold:",sourceWindow,&threshValue,maxThreshValue,cornerHarrisDemo);
+    createTrackbar("Shi-Tomas Threshold:",sourceWindow,&ShiConers,maxShiTrackBAR,shiTomasiDemo);
 
     imshow(sourceWindow,src);
     cornerHarrisDemo(0,0);
+    shiTomasiDemo(0,0);
     waitKey(0);
     return 0;
 }
@@ -69,4 +79,39 @@ void cornerHarrisDemo(int,void*)
     namedWindow("corners",CV_WINDOW_AUTOSIZE);
     imshow("corners",dst_norm_scaled);
 
+}
+
+
+void shiTomasiDemo(int,void*)
+{
+    if (ShiConers < 1) {
+        ShiConers = 1;
+    }
+
+    /// Parameters for Shi-Tomasi algorithm
+    vector<Point2f> corners;
+    double qualityLevel = 0.01;
+    double minDistance = 10;
+    int blockSize = 3;
+    bool userHarrisDetector = false;
+    double k = 0.04;
+
+    Mat copy;
+    copy = src.clone();
+
+    //! finds the strong enough corners where the cornerMinEigenVal() or cornerHarris() report the local maxima
+    // void goodFeaturesToTrack( InputArray image, OutputArray corners,
+    //                                      int maxCorners, double qualityLevel, double minDistance,
+    //                                      InputArray mask=noArray(), int blockSize=3,
+    //                                      bool useHarrisDetector=false, double k=0.04 );
+    goodFeaturesToTrack(srcGray,corners,ShiConers,qualityLevel,minDistance,Mat(),blockSize,userHarrisDetector,k);
+
+    cout<<"** Number of corners detected: "<<corners.size()<<endl;
+
+    for (int i = 0; i < corners.size();i++) {
+        circle(copy,corners[i],4,Scalar(rng.uniform(0,255),rng.uniform(0,255),rng.uniform(0,255)),2,8,0);
+    }
+
+    namedWindow("fuck ShiT-Tomas",CV_WINDOW_AUTOSIZE);
+    imshow("Coners Shi-Tomas",copy);
 }
