@@ -7,11 +7,31 @@
 using namespace std;
 using namespace cv;
 
-int main(int argv, char* argc) 
+int main(int argv, char** argc)
 {
 
     int levels =1;
     Mat img = imread("data/img.jpg");
+    // labelImg.ptr<int>(i-1);
+    int row = 1;
+    int col = 1;
+    //1. This is used for read the grayscale image
+    cout << "fuck img: " << (int)(*(img.data + img.step[0] * row + img.step[1] * col)) << endl;
+    //2. This is used for read the RGB image
+    cout << "fuck rgb" << img.at<Vec3b>(row,col) << endl;
+
+    // 3.This is used for read the BGR image through the channel
+    // [row, col]像素的第 1 通道地址被 * 解析(blue通道)
+    // *(img.data + img.step[0] * row + img.step[1] * col) = 255;
+    // //[row, col]像素的第 2 通道地址被 * 解析(green通道), 关于elemSize1函数的更多描述请见 Fn1 里所列的博文链接
+    // *(img.data + img.step[0] * row + img.step[1] * col + img.elemSize1()) = 255;
+    // //[row, col]像素的第 3 通道地址被 * 解析(red通道)
+    // *(img.data + img.step[0] * row + img.step[1] * col + img.elemSize1() * 2) = 255;
+
+    // 4.
+    uchar* data = img.ptr<uchar>(row);
+    cout << "4 fuck img bgr: " << (int)data[col*3] << " : " << (int)data[col * 3 + 1] << " : " << (int)data[col *3 + 2] << endl;
+
     namedWindow("original");
 
     imshow("original",img);
