@@ -12,7 +12,7 @@ int main(int argc, char** argv)
     Mat img1,img2;
     img1= imread("data/img5.jpg",CV_LOAD_IMAGE_GRAYSCALE);
     img2= imread("data/img6.jpg",CV_LOAD_IMAGE_GRAYSCALE);
-    resize(img1,img2,img1.size());
+    resize(img2,img2,img1.size());
 
     // detect the keypoint
     // cv::Ptr<cv::FeatureDetector> detector = cv::FeatureDetector::create("");
