@@ -11,7 +11,7 @@ Mat src, dst, cdst;
 char *windowName = "detected lines";
 int thresHoldValue = 50;
 int maxThresHoldValue = 200;
-int main(int argc, char* argv)
+int main(int argc, char** argv)
 {
 
     src = imread("data/img4.jpg");
